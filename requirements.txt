@@ -1,0 +1,16 @@
+pytest-asyncio
+pytest
+fastapi[all]
+databases[aiomysql]
+apscheduler
+redis
+httpx
+aiokafka
+boto3
+pyjwt
+alembic
+PyCryptodomex
+Pillow
+cryptography
+requests
+twilio
