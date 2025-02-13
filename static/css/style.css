@@ -1,0 +1,76 @@
+body {
+  color: white !important;
+  background-color: black !important;
+}
+
+.header-logo > img {
+  cursor: pointer;
+}
+
+.header-search {
+  width: 600px !important;
+}
+
+.header-search > input {
+  background-color: black;
+  border-radius: 40px 0 0 40px;
+  border: 1px solid #41464b;
+}
+
+.header-search > input:focus {
+  background-color: black;
+}
+
+.header-search > input::placeholder {
+  color: #41464b;
+}
+
+.header-search > div > span {
+  border: 1px solid #41464b;
+  border-radius: 0 40px 40px 0;
+  background-color: #41464b;
+  width: 70px;
+  padding-left: 25px;
+}
+
+.header-login {
+  padding: 5px 15px;
+  background-color: black;
+  border: 1px solid #41464b;
+  border-radius: 40px;
+  width: 95px !important;
+}
+
+.header-login > a {
+  margin-left: 5px !important;
+  margin-top: 2px !important;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-main {
+  padding: 0 5px;
+}
+
+.nav-sub.active {
+  background-color: #41464b;
+}
+
+.nav-sub {
+  border-radius: 10px;
+}
+
+.nav-sub:hover {
+  cursor: pointer;
+  background-color: #6c757d;
+}
+
+.nav-sub > i {
+  font-size: 20px !important;
+}
+
+.nav-sub > span {
+  padding-left: 20px;
+  color: white;
+  text-decoration: none;
+}

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
@@ -11,12 +13,13 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 
-from app.common.register import BlueprintRegister
-from app.common.response import PermissionDeniedException, error, NotFoundException, BadRequestException, verify_token
+from app.common.register import APIRouterRegister
+from app.common.response import PermissionDeniedException, error, NotFoundException, BadRequestException
 from app.common.websocket import WsConnectionManager
 from app.database.cache import Cache
 from app.database.mysql import database
 from config import Config
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,42 +27,31 @@ async def lifespan(app: FastAPI):
     # scheduler.start()
     yield
     await database.disconnect()
-app = FastAPI(docs_url='/A9buAGuA', redoc_url='/AA9Wbe2A', openapi_url='/AAWksi3A', lifespan=lifespan)
-BlueprintRegister(app, 'app.router', 'router').register()
+
+
+security = HTTPBasic()
+def doc_auth(credentials: HTTPBasicCredentials = Depends(security)):
+    if credentials.username != 'admin' or credentials.password != '1234':
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
+APIRouterRegister(app, 'app.router', 'router').register()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 app.mount('/static', StaticFiles(directory=Config.STATIC_DIR), name='static')
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title="고민들어줌 서버",
-        version="1.0.0",
-        description="고민들어줌 서버 스웨거 입니다.",
-        routes=app.routes,
-    )
-    openapi_schema["components"]["securitySchemes"] = {
-        "XAccessTokenAuth": {
-            "type": "apiKey",
-            "name": "x-access-token",
-            "in": "header",
-        }
-    }
-    openapi_schema["security"] = [{"XAccessTokenAuth": []}]
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-app.openapi = custom_openapi
-
 templates = Jinja2Templates(directory=Config.TEMPLATES_DIR)
-
 manager = WsConnectionManager()
+
 
 @app.websocket('/ws/chat/{room}')
 async def chat_endpoint(websocket: WebSocket, room: str):
@@ -108,3 +100,38 @@ async def main():
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
     return FileResponse(f'{Config.STATIC_DIR}/favicon.ico')
+
+
+@app.get('/AAA', include_in_schema=False)
+async def get_docs(credentials: HTTPBasicCredentials = Depends(doc_auth)):
+    return get_swagger_ui_html(openapi_url='/CCC', title='핸즈온 문서')
+
+
+@app.get('/BBB', include_in_schema=False)
+async def get_redocs(credentials: HTTPBasicCredentials = Depends(doc_auth)):
+    return get_redoc_html(openapi_url='/CCC', title='핸즈온 문서')
+
+
+@app.get('/CCC', include_in_schema=False)
+async def get_openapi_info(credentials: HTTPBasicCredentials = Depends(doc_auth)):
+    openapi_schema = get_openapi(
+        title='핸즈온',
+        version='1.0.0',
+        description='핸즈온 문서입니다.',
+        routes=app.routes,
+    )
+
+    if 'components' not in openapi_schema:
+        openapi_schema['components'] = {}
+    if 'securitySchemes' not in openapi_schema['components']:
+        openapi_schema['components']['securitySchemes'] = {}
+
+    openapi_schema['components']['securitySchemes'] = {
+        'XAccessTokenAuth': {
+            'type': 'apiKey',
+            'name': 'x-access-token',
+            'in': 'header',
+        }
+    }
+    openapi_schema['security'] = [{'XAccessTokenAuth': []}]
+    return openapi_schema

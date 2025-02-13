@@ -143,3 +143,6 @@ config.json
 
 # mac
 .DS_Store
+
+alembic/versions/*
+!alembic/versions/.gitkeep

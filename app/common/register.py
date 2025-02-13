@@ -4,7 +4,7 @@ import os
 import re
 
 
-class BlueprintRegister:
+class APIRouterRegister:
     def __init__(self, app, module_path, controller_name):
         self.app = app
         self.module_path = module_path

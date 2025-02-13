@@ -5,8 +5,7 @@ class UserService:
     @staticmethod
     async def create(user_entity: UserEntity) -> UserEntity:
         query = user_table.insert().values(email=user_entity.email, provider=user_entity.provider,
-                                           nickname='nickname', created_at=user_entity.created_at,
-                                           image=None)
+                                           created_at=user_entity.created_at)
         ai = await database.execute(query)
         user_entity.id = ai
         return user_entity

@@ -1,20 +1,20 @@
 import requests
 
-from app.database.mysql import UserEmailEntity
+from app.database.mysql import UserEntity
 
 
 class EmailSender:
-    def __init__(self, user_email_entity: UserEmailEntity):
-        self.user_email_entity = user_email_entity
+    def __init__(self, user_entity: UserEntity):
+        self.user_entity = user_entity
 
-    def send(self, code: str) -> bool:
+    def send(self, title: str, body: str) -> bool:
         data = {
-            'senderAddress': 'gomin@devmaker.kr',
-            'title': f'[고민들어줌] 이메일 인증',
-            'body': f'[고민들어줌]\n<h1>{code}</h1>',
+            'senderAddress': 'youtube@devmaker.kr',
+            'title': title,
+            'body': body,
             'receiverList': [
                 {
-                    'receiveMailAddr': self.user_email_entity.email,
+                    'receiveMailAddr': self.user_entity.email,
                 },
             ]
         }

@@ -1,9 +1,11 @@
-from twilio.rest import Client
-from enum import Enum
-from abc import ABCMeta, abstractmethod
 import json
 import requests
 import twilio
+from twilio.rest import Client
+from enum import Enum
+from abc import ABCMeta, abstractmethod
+
+from app.common.response import BadRequestException
 
 
 class SmsEnum(Enum):
@@ -30,13 +32,14 @@ class SmsFactory:
         """
             send factory version
         """
-        klass = None
         if self.kind.value == SmsEnum.ALIGO.value:
             klass = AligoSMS(self.phone_number)
         elif self.kind.value == SmsEnum.TWILIO.value:
             klass = TwilioSMS(self.phone_number)
+        else:
+            raise BadRequestException()
 
-        return klass.send(message) if klass else False
+        return klass.send(message)
 
 
 class SMS(metaclass=ABCMeta):
@@ -54,16 +57,16 @@ class AligoSMS(SMS):
         """
         :param phone_number:
         """
+        self.api_key = '50uf4d6nw1pjmwvpdiuhruhuq7ota7o4'
         self.phone_number = phone_number
 
     def send(self, message) -> bool:
         """
             send aligo
         """
-        api_key = '50uf4d6nw1pjmwvpdiuhruhuq7ota7o4'
 
         data = {
-            'key': api_key,
+            'key': self.api_key,
             'user_id': 'wyun13043',
             'sender': '01084173012',
             'receiver': self.phone_number,
@@ -81,17 +84,17 @@ class TwilioSMS(SMS):
         """
         :param phone_number:
         """
+        self.accounts_sid = ''
+        self.auth_token = ''
         self.phone_number = phone_number
 
     def send(self, message) -> bool:
         """
             send twilio
         """
-        accounts_sid = ''
-        auth_token = ''
 
         try:
-            client = Client(accounts_sid, auth_token)
+            client = Client(self.accounts_sid, self.auth_token)
             client.messages.create(body=message, from_='+16183681494', to=self.phone_number)
         except twilio.base.exceptions.TwilioRestException as e:
             print(e)
