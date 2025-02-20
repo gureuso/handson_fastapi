@@ -74,3 +74,45 @@ body {
   color: white;
   text-decoration: none;
 }
+
+.login {
+  background-color: white;
+  color: black;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+#google-login > span:nth-child(1) > img {
+  width: 30px;
+}
+
+#google-login > span:nth-child(2) {
+  margin-top: 1px;
+  margin-left: 1px;
+}
+
+#kakao-login {
+  background-color: #FEE500;
+}
+
+#kakao-login > span:nth-child(1) > img {
+  width: 30px;
+}
+
+#kakao-login > span:nth-child(2) {
+  margin-top: 1px;
+  margin-left: 1px;
+}
+
+#github-login > span:nth-child(1) > img {
+  width: 30px;
+}
+
+#github-login > span:nth-child(2) {
+  margin-top: 1px;
+  margin-left: 1px;
+}

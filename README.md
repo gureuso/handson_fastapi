@@ -1,6 +1,8 @@
 # Handson FastAPI
 Handson FastAPI example
 
+python >= 3.12
+
 # Usage
 
 ### 1. install virtualenv
@@ -19,20 +21,24 @@ $ pip install -r requirements.txt
 ```
 
 ### 2. set environment or create config.json
-| Name                | Description                      |
-| ------------------- | -------------------------------- |
+| Name                | Description                                  |
+| ------------------- |----------------------------------------------|
 | APP_MODE            | choose from production, development, testing |
-| APP_HOST            | ip address                       |
-| APP_PORT            | port number                      |
-| DB_USER_NAME        | db user name                     |
-| DB_USER_PASSWD      | db user password                 |
-| DB_HOST             | db host                          |
-| DB_DB_NAME          | db name                          |
-| REDIS_HOST          | redis ip address                 |
-| REDIS_PASSWD        | redis password                   |
+| APP_HOST            | ip address ex) 0.0.0.0                       |
+| APP_PORT            | port number                                  |
+| DB_USER_NAME        | db user name                                 |
+| DB_USER_PASSWD      | db user password                             |
+| DB_HOST             | db host                                      |
+| DB_DB_NAME          | db name                                      |
+| REDIS_HOST          | redis ip address                             |
+| REDIS_PASSWD        | redis password                               |
 
 ### 3. db migrate
+```mysql
+create database Youtube
+```
+
 ```sh
 $ alembic upgrade head
 ```
-migrate db tables
+create db and migrate tables

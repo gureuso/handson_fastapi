@@ -5,7 +5,48 @@
 {% endblock %}
 
 {% block content %}
-login
+<div class="mt-2 row">
+  <div class="col-4">
+  </div>
+  <div class="col-4">
+    <div id="google-login" class="login" onclick="window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' +
+						'scope=email%20profile&' +
+						'response_type=code&' +
+						'state=security_token%3D138r5719ru3e1%26url%3Dhttps://oauth2.example.com/token&' +
+						'redirect_uri=' + get_redirect_uri('google') + '&' +
+						'client_id={{ GOOGLE_CLIENT_ID }}';">
+      <span>
+        <img src="/static/img/login_google_icon.png" alt="">
+      </span>
+      <span>구글로 시작</span>
+    </div>
+    <div id="kakao-login" class="login" onclick="window.location.href = 'https://kauth.kakao.com/oauth/authorize?' +
+						'client_id=019b2468962364c725978946c23b8953&' +
+						'redirect_uri=' + get_redirect_uri('kakao') + '&' +
+						'response_type=code';">
+      <span>
+        <img src="/static/img/login_kakao_icon.png" alt="">
+      </span>
+      <span>카카오로 시작</span>
+    </div>
+    <div id="github-login" class="login">
+      <span>
+        <img src="/static/img/login_github_icon.png" alt="">
+      </span>
+      <span>깃허브로 시작</span>
+    </div>
+  </div>
+  <div class="col-4">
+  </div>
+</div>
 {% endblock %}
 {% block script %}
+<script>
+  function get_redirect_uri(provider) {
+    const protocol = location.protocol;
+    const port = location.port ? ':'+location.port : '';
+    const hostname = window.location.hostname;
+    return protocol + '//' + hostname + port + '/youtube/login/callback/' + provider;
+  }
+</script>
 {% endblock %}
