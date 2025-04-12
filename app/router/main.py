@@ -71,6 +71,11 @@ async def page_not_found_exception_handler(request: Request, exc: HTTPException)
     # return templates.TemplateResponse(f'{exc.status_code}.html', {'request': request, 'current_user': current_user})
 
 
+@app.exception_handler(422)
+async def page_not_found_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(status_code=exc.status_code, content=error(exc.status_code * 100))
+
+
 @app.exception_handler(BadRequestException)
 async def bad_request_exception_handler(request: Request, exc: BadRequestException):
     return JSONResponse(status_code=400, content=error(40000))

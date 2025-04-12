@@ -38,7 +38,8 @@ body {
   background-color: black;
   border: 1px solid #41464b;
   border-radius: 40px;
-  width: 95px !important;
+  width: 100px !important;
+  cursor: pointer;
 }
 
 .header-login > a {
@@ -46,6 +47,10 @@ body {
   margin-top: 2px !important;
   color: white;
   text-decoration: none;
+}
+
+.header-login-profile {
+
 }
 
 .nav-main {

@@ -36,6 +36,7 @@ class Config:
         41000: 'Gone',
         40300: 'Forbidden',
         40400: 'Not Found',
+        42200: 'Invalid Request',
         50000: 'Internal Server Error',
     }
 

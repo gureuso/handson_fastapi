@@ -21,7 +21,7 @@
       <span>구글로 시작</span>
     </div>
     <div id="kakao-login" class="login" onclick="window.location.href = 'https://kauth.kakao.com/oauth/authorize?' +
-						'client_id=019b2468962364c725978946c23b8953&' +
+						'client_id={{ KAKAO_CLIENT_ID }}&' +
 						'redirect_uri=' + get_redirect_uri('kakao') + '&' +
 						'response_type=code';">
       <span>
@@ -29,7 +29,7 @@
       </span>
       <span>카카오로 시작</span>
     </div>
-    <div id="github-login" class="login">
+    <div id="github-login" class="login" onclick="window.location.href = 'https://github.com/login/oauth/authorize?client_id={{ GITHUB_CLIENT_ID }}&redirect_uri=' + get_redirect_uri('github')">
       <span>
         <img src="/static/img/login_github_icon.png" alt="">
       </span>
@@ -46,7 +46,7 @@
     const protocol = location.protocol;
     const port = location.port ? ':'+location.port : '';
     const hostname = window.location.hostname;
-    return protocol + '//' + hostname + port + '/youtube/login/callback/' + provider;
+    return protocol + '//' + hostname + port + '/youtube/api/callback/' + provider;
   }
 </script>
 {% endblock %}
