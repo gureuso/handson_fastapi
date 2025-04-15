@@ -32,7 +32,7 @@ async def login_callback(provider: Literal['google', 'facebook', 'kakao', 'naver
         ))
 
 
-    response = RedirectResponse(url='/youtube', status_code=status.HTTP_302_FOUND)
+    response = RedirectResponse(url='http://localhost:3000' if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr', status_code=status.HTTP_302_FOUND)
 
     response.set_cookie('x-access-token',
                         jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
