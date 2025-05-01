@@ -19,8 +19,8 @@ class EmailSender:
             ]
         }
         res = requests.post(
-            'https://api-mail.cloud.toast.com/email/v2.0/appKeys/C2yuVilGsblg9Z8D/sender/eachMail',
+            'https://api-mail.cloud.toast.com/email/v2.0/appKeys/C2yuVilGsblg9Z8A/sender/eachMail',
             json=data,
-            headers={'X-Secret-Key': '5Ks2kQvi'},
+            headers={'X-Secret-Key': '5Ks2kQvA'},
         )
         return res.json()['header']['isSuccessful']

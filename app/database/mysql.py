@@ -23,6 +23,9 @@ user_table = sqlalchemy.Table(
     sqlalchemy.Column('phone_number', sqlalchemy.String(40), nullable=True),
     sqlalchemy.Column('phone_validation_number', sqlalchemy.String(10), nullable=True),
     sqlalchemy.Column('phone_send_at', sqlalchemy.TIMESTAMP, nullable=True),
+    sqlalchemy.Column('phone_is_validation', sqlalchemy.SMALLINT, server_default='0', nullable=True),
+    sqlalchemy.Column('email_validation_number', sqlalchemy.String(10), nullable=True),
+    sqlalchemy.Column('email_is_validation', sqlalchemy.SMALLINT, server_default='0', nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 engine = sqlalchemy.create_engine(DATABASE_URL)
@@ -35,4 +38,7 @@ class UserEntity(BaseModel):
     phone_number: str | None
     phone_validation_number: str | None
     phone_send_at: datetime | None
+    phone_is_validation: int
+    email_validation_number: str | None
+    email_is_validation: int
     created_at: datetime

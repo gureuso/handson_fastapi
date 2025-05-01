@@ -2,6 +2,7 @@ import re
 import jwt
 from fastapi.requests import Request
 
+from app.database.mysql import UserEntity
 from app.service.user import UserService
 from config import Config
 
@@ -40,25 +41,25 @@ async def is_mobile(request: Request) -> bool:
     return bool(pattern.search(user_agent))
 
 
-async def verify_token(request: Request):
+async def verify_token(request: Request) -> None | UserEntity:
     token = request.cookies.get('x-access-token') or request.headers.get('x-access-token')
     if not token:
-        raise PermissionDeniedException()
+        return None
     jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'])
     current_user = await UserService.find_one_by_id(jwt_data['id'])
     if not current_user:
-        raise PermissionDeniedException()
+        return None
 
     return current_user
 
 
-async def verify_api_token(request: Request):
+async def verify_api_token(request: Request) -> UserEntity:
     token = request.cookies.get('x-access-token') or request.headers.get('x-access-token')
     if not token:
-        return None
+        raise PermissionDeniedException()
     jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'])
     current_user = await UserService.find_one_by_id(jwt_data['id'])
     if not current_user:
-        return None
+        raise PermissionDeniedException()
 
     return current_user

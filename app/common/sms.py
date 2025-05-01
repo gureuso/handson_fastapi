@@ -57,7 +57,7 @@ class AligoSMS(SMS):
         """
         :param phone_number:
         """
-        self.api_key = '50uf4d6nw1pjmwvpdiuhruhuq7ota7o4'
+        self.api_key = ''
         self.phone_number = phone_number
 
     def send(self, message) -> bool:
@@ -95,7 +95,7 @@ class TwilioSMS(SMS):
 
         try:
             client = Client(self.accounts_sid, self.auth_token)
-            client.messages.create(body=message, from_='+16183681494', to=self.phone_number)
+            client.messages.create(body=message, from_='+18482929136', to=self.phone_number)
         except twilio.base.exceptions.TwilioRestException as e:
             print(e)
             return False
