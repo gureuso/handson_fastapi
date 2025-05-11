@@ -75,11 +75,17 @@ async def signout():
     if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT:
         response = RedirectResponse(
             url='http://localhost:3000', status_code=status.HTTP_302_FOUND)
-        response.delete_cookie('x-access-token', path='/', httponly=True)
+        response.delete_cookie('x-access-token')
     else:
         response = RedirectResponse(
             url='https://youtube.devmaker.kr', status_code=status.HTTP_302_FOUND)
-        response.delete_cookie('x-access-token', path='/', secure=True, httponly=True)
+        response.delete_cookie(
+            key='x-access-token',
+            domain='.devmaker.kr',
+            path='/',
+            secure=True,
+            samesite='lax'
+        )
     return response
 
 
