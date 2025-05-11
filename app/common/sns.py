@@ -50,7 +50,7 @@ class GoogleLogin:
             'code': self.code,
             'client_id': JsonConfig.get_data('GOOGLE_CLIENT_ID'),
             'client_secret': JsonConfig.get_data('GOOGLE_SECRET_ID'),
-            'redirect_uri': 'http://localhost:8888/youtube/api/callback/google' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr/youtube/api/callback/google',
+            'redirect_uri': 'http://localhost:8888/youtube/api/callback/google' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube-api.devmaker.kr/youtube/api/callback/google',
             'grant_type': 'authorization_code'
         }
         res = requests.post('https://www.googleapis.com/oauth2/v4/token', data=data)
@@ -72,7 +72,7 @@ class KakaoLogin:
         data = {
             'grant_type': 'authorization_code',
             'client_id': JsonConfig.get_data('KAKAO_CLIENT_ID'),
-            'redirect_uri': 'http://localhost:8888/youtube/api/callback/kakao' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr/youtube/api/callback/kakao',
+            'redirect_uri': 'http://localhost:8888/youtube/api/callback/kakao' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube-api.devmaker.kr/youtube/api/callback/kakao',
             'code': self.code,
         }
         res = requests.post('https://kauth.kakao.com/oauth/token', data=data)
@@ -94,7 +94,7 @@ class FacebookLogin:
             'client_id': JsonConfig.get_data('FB_CLIENT_ID'),
             'client_secret': JsonConfig.get_data('FB_SECRET_ID'),
             'code': self.code,
-            'redirect_uri': 'http://localhost:8888/youtube/api/callback/facebook' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr/youtube/api/callback/facebook',
+            'redirect_uri': 'http://localhost:8888/youtube/api/callback/facebook' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube-api.devmaker.kr/youtube/api/callback/facebook',
         }
         res = requests.get('https://graph.facebook.com/oauth/access_token', params=params)
         res = res.json()
@@ -118,7 +118,7 @@ class NaverLogin:
             'client_secret': JsonConfig.get_data('NAVER_SECRET_ID'),
             'code': self.code,
             'state': self.code,
-            'redirect_uri': 'http://localhost:8888/youtube/api/callback/naver' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr/youtube/api/callback/naver',
+            'redirect_uri': 'http://localhost:8888/youtube/api/callback/naver' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube-api.devmaker.kr/youtube/api/callback/naver',
         }
         res = requests.get('https://nid.naver.com/oauth2.0/token', params=params)
         res = res.json()
@@ -140,7 +140,7 @@ class GithubLogin:
             'client_id': JsonConfig.get_data('GITHUB_CLIENT_ID'),
             'client_secret': JsonConfig.get_data('GITHUB_SECRET_ID'),
             'code': self.code,
-            'redirect_uri': 'http://localhost:8888/youtube/api/callback/github' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr/youtube/api/callback/github',
+            'redirect_uri': 'http://localhost:8888/youtube/api/callback/github' if JsonConfig.get_data('APP_MODE') == Config.APP_MODE_DEVELOPMENT else 'https://youtube-api.devmaker.kr/youtube/api/callback/github',
         }
         res = requests.post('https://github.com/login/oauth/access_token', headers={'Accept': 'application/json'},
                             data=params)
