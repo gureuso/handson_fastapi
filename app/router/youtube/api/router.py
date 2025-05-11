@@ -98,5 +98,7 @@ async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'gi
 
     response.set_cookie('x-access-token',
                         jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
-                        httponly=True)
+                        domain='.devmaker.kr',
+                        httponly=True,
+                        secure=False if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT else True)
     return response
