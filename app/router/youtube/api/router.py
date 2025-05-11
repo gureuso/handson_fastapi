@@ -72,8 +72,14 @@ async def auth_email_send(current_user: UserEntity | None = Depends(verify_api_t
 
 @router.get('/signout')
 async def signout():
-    response = RedirectResponse(url='http://localhost:3000' if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr', status_code=status.HTTP_302_FOUND)
-    response.set_cookie('x-access-token', '', httponly=True)
+    if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT:
+        response = RedirectResponse(
+            url='http://localhost:3000', status_code=status.HTTP_302_FOUND)
+        response.delete_cookie('x-access-token', path='/', httponly=True)
+    else:
+        response = RedirectResponse(
+            url='https://youtube.devmaker.kr', status_code=status.HTTP_302_FOUND)
+        response.delete_cookie('x-access-token', path='/', secure=True, httponly=True)
     return response
 
 
