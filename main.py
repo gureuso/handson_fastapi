@@ -1,5 +1,4 @@
 import os
-import uvicorn
 
 from config import Config
 
@@ -14,6 +13,7 @@ except FileNotFoundError:
 
 
 if __name__ == '__main__':
+    import uvicorn
     uvicorn.run(
         'app.router.main:app',
         host=Config.APP_HOST,
