@@ -44,6 +44,6 @@ async def ch2_get_students(class_id: int):
 async def ch2_create_student(class_id: int):
     for klass in classes:
         if klass['class_id'] == class_id:
-            klass['students'].append({'class_id': klass['class_id'], 'student_name': f'test{len(klass['students']) + 1}'})
+            klass['students'].append({'class_id': klass['class_id'], 'student_name': f'test{len(klass["students"]) + 1}'})
             break
     return {}
