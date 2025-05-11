@@ -96,9 +96,14 @@ async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'gi
 
     response = RedirectResponse(url='http://localhost:3000' if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr', status_code=status.HTTP_302_FOUND)
 
-    response.set_cookie('x-access-token',
-                        jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
-                        domain='.devmaker.kr',
-                        httponly=True,
-                        secure=False if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT else True)
+    if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT:
+        response.set_cookie('x-access-token',
+                            jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
+                            httponly=True)
+    else:
+        response.set_cookie('x-access-token',
+                            jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
+                            domain='.devmaker.kr',
+                            httponly=True,
+                            secure=True)
     return response
