@@ -60,7 +60,7 @@ async def chat_endpoint(websocket: WebSocket, room: str):
         while True:
             data = await websocket.receive_text()
             await manager.broadcast(f'{data}', room)
-            await Cache.rpush(f'gomin_room_{room}', data)
+            await Cache.rpush(f'fastapi_room_{room}', data)
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
 
