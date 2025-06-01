@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>websocket</title>
+</head>
+<body>
+<h1>WebSocket Chat</h1>
+<form action="" onsubmit="sendMessage(event)">
+  <input type="text" id="messageText" autocomplete="off"/>
+  <button>Send</button>
+</form>
+<ul id='messages'>
+</ul>
+<script>
+  var ws = new WebSocket("ws://localhost:8888/ws/chat/1");
+  ws.onmessage = function(event) {
+    var messages = document.getElementById('messages')
+    var message = document.createElement('li')
+    var content = document.createTextNode(event.data)
+    message.appendChild(content)
+    messages.appendChild(message)
+  };
+  function sendMessage(event) {
+    var input = document.getElementById("messageText")
+    ws.send(input.value)
+    input.value = ''
+    event.preventDefault()
+  }
+</script>
+</body>
+</html>

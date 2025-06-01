@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter
 from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 from pydantic import BaseModel
 
 from config import Config
@@ -23,6 +24,11 @@ class PostEntity(BaseModel):
 @router.get('')
 async def main():
     return {'ping': 'pong'}
+
+
+@router.get('/ws')
+async def ws(request: Request):
+    return templates.TemplateResponse('ws.html', {'request': request})
 
 
 posts: list[PostEntity] = []
