@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from uuid import uuid4
 
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from pydantic import BaseModel
@@ -29,6 +29,16 @@ async def main():
 @router.get('/ws')
 async def ws(request: Request):
     return templates.TemplateResponse('ws.html', {'request': request})
+
+
+@router.get('/task')
+async def task(task_id: int, background_tasks: BackgroundTasks):
+    def write_log(task_id: int):
+        print(f'{task_id} Task start')
+
+    print(f'{task_id} API end')
+    background_tasks.add_task(write_log, task_id)
+    return {}
 
 
 posts: list[PostEntity] = []
