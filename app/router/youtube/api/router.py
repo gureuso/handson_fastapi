@@ -13,7 +13,10 @@ from app.common.response import verify_api_token, BadRequestException
 from app.common.sms import SmsFactory, SmsEnum
 from app.common.sns import SNSInfo
 from app.database.mysql import UserEntity
+from app.service.shorts import ShortsService
+from app.service.tag import TagService
 from app.service.user import UserService
+from app.service.video import VideoService
 from config import Config, JsonConfig
 
 router = APIRouter(prefix='/youtube/api')
@@ -22,6 +25,14 @@ templates = Jinja2Templates(directory=Config.TEMPLATES_DIR)
 
 class SMSItem(BaseModel):
     phone: str
+
+
+@router.get('/videos')
+async def find_video_list(current_user: UserEntity | None = Depends(verify_api_token)):
+    tags = await TagService.find_unique_tag()
+    videos = await VideoService.find_all()
+    shorts = await ShortsService.find_all()
+    return {'tags': tags, 'videos': videos, 'shorts': shorts}
 
 
 @router.get('/auth/sms')

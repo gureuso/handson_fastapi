@@ -28,8 +28,85 @@ user_table = sqlalchemy.Table(
     sqlalchemy.Column('email_is_validation', sqlalchemy.SMALLINT, server_default='0', nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
+tag_table = sqlalchemy.Table(
+    'Tag',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('video_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('name', sqlalchemy.String(20), nullable=True),
+)
+channel_table = sqlalchemy.Table(
+    'Channel',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('name', sqlalchemy.String(255), unique=True),
+    sqlalchemy.Column('image', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
+video_table = sqlalchemy.Table(
+    'Video',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('channel_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('title', sqlalchemy.String(255), nullable=True),
+    sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('view_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+    sqlalchemy.Column('tag', sqlalchemy.String(20), nullable=True),
+)
+shorts_table = sqlalchemy.Table(
+    'Shorts',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('channel_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('title', sqlalchemy.String(255), nullable=True),
+    sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('view_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+    sqlalchemy.Column('tag', sqlalchemy.String(20), nullable=True),
+)
 engine = sqlalchemy.create_engine(DATABASE_URL)
 
+
+class ShortsEntity(BaseModel):
+    id: Optional[int] = None
+    channel_id: Optional[int] = None
+    tag: str
+    title: str
+    thumbnail: str
+    content: str
+    view_cnt: int
+    created_at: datetime
+
+
+class VideoEntity(BaseModel):
+    id: Optional[int] = None
+    channel_id: Optional[int] = None
+    tag: str
+    title: str
+    thumbnail: str
+    content: str
+    view_cnt: int
+    created_at: datetime
+
+    # mix
+    name: Optional[str] = None
+    image: Optional[str] = None
+
+
+class ChannelEntity(BaseModel):
+    id: Optional[int] = None
+    name: str
+    image: str
+    created_at: datetime
+
+
+class TagEntity(BaseModel):
+    id: Optional[int] = None
+    video_id: Optional[int] = None
+    name: str
 
 class UserEntity(BaseModel):
     id: Optional[int] = None
