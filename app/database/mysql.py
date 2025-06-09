@@ -52,6 +52,8 @@ video_table = sqlalchemy.Table(
     sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('view_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('like_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('dislike_cnt', sqlalchemy.BIGINT, server_default='0'),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
     sqlalchemy.Column('tag', sqlalchemy.String(20), nullable=True),
 )
@@ -64,6 +66,8 @@ shorts_table = sqlalchemy.Table(
     sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('view_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('like_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('dislike_cnt', sqlalchemy.BIGINT, server_default='0'),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
     sqlalchemy.Column('tag', sqlalchemy.String(20), nullable=True),
 )
@@ -78,6 +82,8 @@ class ShortsEntity(BaseModel):
     thumbnail: str
     content: str
     view_cnt: int
+    like_cnt: Optional[int] = 0
+    dislike_cnt: Optional[int] = 0
     created_at: datetime
 
 
@@ -89,6 +95,8 @@ class VideoEntity(BaseModel):
     thumbnail: str
     content: str
     view_cnt: int
+    like_cnt: Optional[int] = 0
+    dislike_cnt: Optional[int] = 0
     created_at: datetime
 
     # mix

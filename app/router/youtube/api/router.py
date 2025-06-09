@@ -3,7 +3,7 @@ import jwt
 import random
 from typing import Literal
 from datetime import datetime
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
@@ -25,6 +25,16 @@ templates = Jinja2Templates(directory=Config.TEMPLATES_DIR)
 
 class SMSItem(BaseModel):
     phone: str
+
+
+@router.post('/videos/{video_id}/like')
+async def add_video_like_cnt(video_id: int, background_tasks: BackgroundTasks):
+    def add_like_cnt(task_id: int):
+        print(f'{task_id} Task start')
+
+    print(f'{task_id} API end')
+    background_tasks.add_task(write_log, task_id)
+    return {}
 
 
 @router.get('/videos')
