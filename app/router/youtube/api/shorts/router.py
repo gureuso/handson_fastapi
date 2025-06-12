@@ -2,12 +2,14 @@
 import json
 from typing import List
 from datetime import datetime
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends
 from fastapi.templating import Jinja2Templates
 
+from app.common.response import verify_api_token
 from app.database.cache import Cache
-from app.database.mysql import ShortsEntity
+from app.database.mysql import ShortsEntity, UserEntity, ShortsLikeEnum, ShortsLikeEntity
 from app.service.shorts import ShortsService
+from app.service.shorts_like import ShortsLikeService
 from config import Config
 
 router = APIRouter(prefix='/youtube/api/shorts')
@@ -15,7 +17,7 @@ templates = Jinja2Templates(directory=Config.TEMPLATES_DIR)
 
 
 @router.get('/{shorts_id}')
-async def get_shorts(shorts_id: int):
+async def get_shorts(shorts_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
     def custom_serializer(obj):
         if isinstance(obj, datetime):
             return datetime.strftime(obj, '%Y-%m-%d %H:%M:%S')
@@ -52,22 +54,33 @@ async def get_shorts(shorts_id: int):
             current_shorts = shorts
             next_shorts = shorts_list[0] if len(shorts_list) == idx + 1 else shorts_list[idx + 1]
 
-    return {'current_shorts': current_shorts, 'next_shorts': next_shorts}
+    liked: dict = await ShortsLikeService.find_one_by_liked(current_shorts.id, current_user.id)
+    disliked: dict = await ShortsLikeService.find_one_by_disliked(current_shorts.id, current_user.id)
+    return {
+        'current_shorts': current_shorts, 'next_shorts': next_shorts,
+        'liked': liked, 'disliked': disliked, 'comment_cnt': 0,
+    }
 
 
 @router.post('/{shorts_id}/like')
-async def add_shorts_like_cnt(shorts_id: int, background_tasks: BackgroundTasks):
-    async def add_like_cnt(shorts_id: int):
-        await ShortsService.update_like_cnt(shorts_id)
-
-    background_tasks.add_task(add_like_cnt, shorts_id)
-    return {}
+async def add_shorts_like_cnt(shorts_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
+    await ShortsLikeService.create(
+        ShortsLikeEntity(
+            kind=ShortsLikeEnum.LIKE, shorts_id=shorts_id, user_id=current_user.id,
+            created_at=datetime.now()
+        )
+    )
+    await ShortsService.update_like_cnt(shorts_id)
+    return await ShortsLikeService.find_one_by_liked(shorts_id, current_user.id)
 
 
 @router.post('/{shorts_id}/dislike')
-async def add_shorts_dislike_cnt(shorts_id: int, background_tasks: BackgroundTasks):
-    async def add_like_cnt(shorts_id: int):
-        await ShortsService.update_dislike_cnt(shorts_id)
-
-    background_tasks.add_task(add_like_cnt, shorts_id)
-    return {}
+async def add_shorts_dislike_cnt(shorts_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
+    await ShortsLikeService.create(
+        ShortsLikeEntity(
+            kind=ShortsLikeEnum.DISLIKE, shorts_id=shorts_id, user_id=current_user.id,
+            created_at=datetime.now()
+        )
+    )
+    await ShortsService.update_dislike_cnt(shorts_id)
+    return await ShortsLikeService.find_one_by_disliked(shorts_id, current_user.id)

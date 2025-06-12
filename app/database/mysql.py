@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
+
 import databases
 import pymysql
 import sqlalchemy
@@ -146,6 +148,42 @@ class ShortsEntity(BaseModel):
     created_at: datetime
 
 
+class ShortsCommentEntity(BaseModel):
+    id: Optional[int] = None
+    parent_id: Optional[int] = None
+    content: str
+    shorts_id: Optional[int] = None
+    user_id: Optional[int] = None
+    created_at: datetime
+
+
+class ShortsCommentLikeEnum(Enum):
+    LIKE = 'LIKE'
+    DISLIKE = 'DISLIKE'
+
+
+class ShortsCommentLikeEntity(BaseModel):
+    id: Optional[int] = None
+    kind: ShortsCommentLikeEnum
+    comment_id: Optional[int] = None
+    shorts_id: Optional[int] = None
+    user_id: Optional[int] = None
+    created_at: datetime
+
+
+class ShortsLikeEnum(Enum):
+    LIKE = 'LIKE'
+    DISLIKE = 'DISLIKE'
+
+
+class ShortsLikeEntity(BaseModel):
+    id: Optional[int] = None
+    kind: ShortsLikeEnum
+    shorts_id: Optional[int] = None
+    user_id: Optional[int] = None
+    created_at: datetime
+
+
 class VideoEntity(BaseModel):
     id: Optional[int] = None
     channel_id: Optional[int] = None
@@ -161,6 +199,42 @@ class VideoEntity(BaseModel):
     # mix
     name: Optional[str] = None
     image: Optional[str] = None
+
+
+class VideoCommentEntity(BaseModel):
+    id: Optional[int] = None
+    parent_id: Optional[int] = None
+    content: str
+    video_id: Optional[int] = None
+    user_id: Optional[int] = None
+    created_at: datetime
+
+
+class VideoCommentLikeEnum(Enum):
+    LIKE = 'LIKE'
+    DISLIKE = 'DISLIKE'
+
+
+class VideoCommentLikeEntity(BaseModel):
+    id: Optional[int] = None
+    kind: VideoCommentLikeEnum
+    comment_id: Optional[int] = None
+    video_id: Optional[int] = None
+    user_id: Optional[int] = None
+    created_at: datetime
+
+
+class VideoLikeEnum(Enum):
+    LIKE = 'LIKE'
+    DISLIKE = 'DISLIKE'
+
+
+class VideoLikeEntity(BaseModel):
+    id: Optional[int] = None
+    kind: ShortsLikeEnum
+    video_id: Optional[int] = None
+    user_id: Optional[int] = None
+    created_at: datetime
 
 
 class ChannelEntity(BaseModel):
