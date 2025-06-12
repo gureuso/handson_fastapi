@@ -28,6 +28,15 @@ user_table = sqlalchemy.Table(
     sqlalchemy.Column('email_is_validation', sqlalchemy.SMALLINT, server_default='0', nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
+channel_table = sqlalchemy.Table(
+    'Channel',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('name', sqlalchemy.String(255), unique=True),
+    sqlalchemy.Column('image', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
 tag_table = sqlalchemy.Table(
     'Tag',
     metadata,
@@ -35,12 +44,47 @@ tag_table = sqlalchemy.Table(
     sqlalchemy.Column('video_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('name', sqlalchemy.String(20), nullable=True),
 )
-channel_table = sqlalchemy.Table(
-    'Channel',
+shorts_table = sqlalchemy.Table(
+    'Shorts',
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
-    sqlalchemy.Column('name', sqlalchemy.String(255), unique=True),
-    sqlalchemy.Column('image', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('channel_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('title', sqlalchemy.String(255), nullable=True),
+    sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('view_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('like_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('dislike_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+    sqlalchemy.Column('tag', sqlalchemy.String(20), nullable=True),
+)
+shorts_comment_table = sqlalchemy.Table(
+    'ShortsComment',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('parent_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('shorts_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
+shorts_comment_like_table = sqlalchemy.Table(
+    'ShortsCommentLike',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('kind', sqlalchemy.String(10), nullable=True),
+    sqlalchemy.Column('comment_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('shorts_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
+shorts_like_table = sqlalchemy.Table(
+    'ShortsLike',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('kind', sqlalchemy.String(10), nullable=True),
+    sqlalchemy.Column('shorts_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 video_table = sqlalchemy.Table(
@@ -57,19 +101,34 @@ video_table = sqlalchemy.Table(
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
     sqlalchemy.Column('tag', sqlalchemy.String(20), nullable=True),
 )
-shorts_table = sqlalchemy.Table(
-    'Shorts',
+video_like_table = sqlalchemy.Table(
+    'VideoLike',
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
-    sqlalchemy.Column('channel_id', sqlalchemy.Integer, nullable=True),
-    sqlalchemy.Column('title', sqlalchemy.String(255), nullable=True),
-    sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
-    sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
-    sqlalchemy.Column('view_cnt', sqlalchemy.BIGINT, server_default='0'),
-    sqlalchemy.Column('like_cnt', sqlalchemy.BIGINT, server_default='0'),
-    sqlalchemy.Column('dislike_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('kind', sqlalchemy.String(10), nullable=True),
+    sqlalchemy.Column('video_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
-    sqlalchemy.Column('tag', sqlalchemy.String(20), nullable=True),
+)
+video_comment_table = sqlalchemy.Table(
+    'VideoComment',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('parent_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('video_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
+video_comment_like_table = sqlalchemy.Table(
+    'VideoCommentLike',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('kind', sqlalchemy.String(10), nullable=True),
+    sqlalchemy.Column('comment_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('shorts_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 engine = sqlalchemy.create_engine(DATABASE_URL)
 
