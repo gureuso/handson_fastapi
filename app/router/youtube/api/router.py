@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import string
 import jwt
 import random
 from typing import Literal
@@ -96,6 +97,15 @@ async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'gi
 
     user = await UserService.find_one_by_email(email)
     if not user:
+        image = [
+            'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_02.png',
+            'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_03.png',
+            'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_04.png',
+            'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_05.png',
+            'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_06.png',
+        ]
+
+        nickname = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         user = await UserService.create(UserEntity(
             email=email,
             provider=provider,
@@ -103,8 +113,9 @@ async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'gi
             phone_number=None,
             phone_send_at=None,
             phone_validation_number=None,
+            profile_image=image[random.randint(0, len(image) - 1)],
+            nickname=nickname,
         ))
-
 
     response = RedirectResponse(url='http://localhost:3000' if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr', status_code=status.HTTP_302_FOUND)
 

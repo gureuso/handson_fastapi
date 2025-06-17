@@ -38,17 +38,27 @@ class ShortsService:
         return [ShortsEntity(**dict(row)) for row in rows]
 
     @staticmethod
-    async def update_like_cnt(shorts_id: int):
-        query = """
-            UPDATE Shorts SET like_cnt = like_cnt + 1 WHERE id = :shorts_id;
-        """
+    async def update_like_cnt(shorts_id: int, liked: bool):
+        if liked:
+            query = """
+                UPDATE Shorts SET like_cnt = like_cnt - 1 WHERE id = :shorts_id;
+            """
+        else:
+            query = """
+                UPDATE Shorts SET like_cnt = like_cnt + 1 WHERE id = :shorts_id;
+            """
         await database.execute(query, {'shorts_id': shorts_id})
         return {}
 
     @staticmethod
-    async def update_dislike_cnt(shorts_id: int):
-        query = """
-            UPDATE Shorts SET dislike_cnt = dislike_cnt + 1 WHERE id = :shorts_id;
-        """
+    async def update_dislike_cnt(shorts_id: int, disliked: bool):
+        if disliked:
+            query = """
+                UPDATE Shorts SET dislike_cnt = dislike_cnt - 1 WHERE id = :shorts_id;
+            """
+        else:
+            query = """
+                UPDATE Shorts SET dislike_cnt = dislike_cnt + 1 WHERE id = :shorts_id;
+            """
         await database.execute(query, {'shorts_id': shorts_id})
         return {}

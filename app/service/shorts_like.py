@@ -13,6 +13,14 @@ class ShortsLikeService:
         return shorts_like_entity
 
     @staticmethod
+    async def delete_by_user_id(shorts_id: int, user_id: int, kind: ShortsLikeEnum):
+        query = """
+            DELETE FROM ShortsLike WHERE shorts_id = :shorts_id AND user_id = :user_id AND kind = :kind;
+        """
+        await database.execute(query, {'shorts_id': shorts_id, 'user_id': user_id, 'kind': kind.value})
+        return {}
+
+    @staticmethod
     async def find_one_by_liked(shorts_id: int, user_id: int) -> dict:
         like_cnt_query = """
             SELECT COUNT(SL.shorts_id) AS cnt FROM ShortsLike AS SL WHERE shorts_id = :shorts_id AND kind = :kind GROUP BY SL.shorts_id

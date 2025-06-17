@@ -8,7 +8,9 @@ class UserService:
                                            created_at=user_entity.created_at, phone_number=user_entity.phone_number,
                                            phone_validation_number=user_entity.phone_validation_number,
                                            phone_send_at=user_entity.phone_send_at,
-                                           email_validation_number=user_entity.email_validation_number,)
+                                           email_validation_number=user_entity.email_validation_number,
+                                           profile_image=user_entity.profile_image,
+                                           nickname=user_entity.nickname,)
         ai = await database.execute(query)
         user_entity.id = ai
         return user_entity

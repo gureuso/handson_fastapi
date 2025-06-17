@@ -5,8 +5,8 @@ import databases
 import pymysql
 import sqlalchemy
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel
+from typing import Optional, List
+from pydantic import BaseModel, Field
 
 from config import Config
 
@@ -28,6 +28,8 @@ user_table = sqlalchemy.Table(
     sqlalchemy.Column('phone_is_validation', sqlalchemy.SMALLINT, server_default='0', nullable=True),
     sqlalchemy.Column('email_validation_number', sqlalchemy.String(10), nullable=True),
     sqlalchemy.Column('email_is_validation', sqlalchemy.SMALLINT, server_default='0', nullable=True),
+    sqlalchemy.Column('profile_image', sqlalchemy.String(255), nullable=True),
+    sqlalchemy.Column('nickname', sqlalchemy.String(20), nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 channel_table = sqlalchemy.Table(
@@ -68,6 +70,8 @@ shorts_comment_table = sqlalchemy.Table(
     sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('shorts_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('like_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('dislike_cnt', sqlalchemy.BIGINT, server_default='0'),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 shorts_comment_like_table = sqlalchemy.Table(
@@ -154,7 +158,16 @@ class ShortsCommentEntity(BaseModel):
     content: str
     shorts_id: Optional[int] = None
     user_id: Optional[int] = None
+    like_cnt: Optional[int] = 0
+    dislike_cnt: Optional[int] = 0
     created_at: datetime
+
+    # tmp
+    profile_image: Optional[str] = None
+    nickname: Optional[str] = None
+    child_comments: List['ShortsCommentEntity'] = Field(default_factory=list)
+    liked: bool = False
+    disliked: bool = False
 
 
 class ShortsCommentLikeEnum(Enum):
@@ -259,4 +272,6 @@ class UserEntity(BaseModel):
     phone_is_validation: int
     email_validation_number: str | None
     email_is_validation: int
+    nickname: str
+    profile_image: str
     created_at: datetime
