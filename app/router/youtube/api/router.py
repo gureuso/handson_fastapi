@@ -126,7 +126,7 @@ async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'gi
     else:
         response.set_cookie('x-access-token',
                             jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
-                            domain='.devmaker.kr',
+                            domain='youtube.devmaker.kr',
                             httponly=True,
                             secure=True)
     return response
