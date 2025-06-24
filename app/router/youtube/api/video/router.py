@@ -13,7 +13,7 @@ router = APIRouter(prefix='/youtube/api/videos')
 templates = Jinja2Templates(directory=Config.TEMPLATES_DIR)
 
 
-@router.get('/')
+@router.get('')
 async def find_video_list(current_user: UserEntity | None = Depends(verify_api_token)):
     tags = await TagService.find_unique_tag()
     videos = await VideoService.find_all()
