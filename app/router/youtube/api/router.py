@@ -82,10 +82,8 @@ async def signout():
             url='https://youtube.devmaker.kr', status_code=status.HTTP_302_FOUND)
         response.delete_cookie(
             key='x-access-token',
-            domain='.devmaker.kr',
-            path='/',
+            domain='youtube.devmaker.kr',
             secure=True,
-            samesite='lax'
         )
     return response
 
