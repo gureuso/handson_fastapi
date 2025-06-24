@@ -132,11 +132,11 @@ async def get_comments(shorts_id: int, current_user: UserEntity | None = Depends
     for comment in comments:
         comment.child_comments = await ShortsCommentService.find_all_by_parent_id(shorts_id, comment.id)
         for child_comment in comment.child_comments:
-            child_comment.liked = (await ShortsCommentLikeService.find_one_by_liked(child_comment.id, child_comment.user_id))['liked']
-            child_comment.disliked = (await ShortsCommentLikeService.find_one_by_disliked(child_comment.id, child_comment.user_id))['disliked']
+            child_comment.liked = (await ShortsCommentLikeService.find_one_by_liked(child_comment.id, current_user.id))['liked']
+            child_comment.disliked = (await ShortsCommentLikeService.find_one_by_disliked(child_comment.id, current_user.id))['disliked']
 
-        comment.liked = (await ShortsCommentLikeService.find_one_by_liked(comment.id, comment.user_id))['liked']
-        comment.disliked = (await ShortsCommentLikeService.find_one_by_disliked(comment.id, comment.user_id))['disliked']
+        comment.liked = (await ShortsCommentLikeService.find_one_by_liked(comment.id, current_user.id))['liked']
+        comment.disliked = (await ShortsCommentLikeService.find_one_by_disliked(comment.id, current_user.id))['disliked']
 
     return {'comments': comments}
 
