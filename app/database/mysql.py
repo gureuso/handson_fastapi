@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
-
 import databases
 import pymysql
 import sqlalchemy
+from enum import Enum
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 
 from config import Config
 
@@ -16,6 +15,25 @@ DATABASE_URL = f'''mysql://{Config.DB_USER_NAME}:{Config.DB_USER_PASSWD}@{Config
 database = databases.Database(DATABASE_URL)
 
 metadata = sqlalchemy.MetaData()
+todo_user_table = sqlalchemy.Table(
+    'TodoUser',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('email', sqlalchemy.String(255), unique=True),
+    sqlalchemy.Column('password', sqlalchemy.String(255), nullable=True),
+    sqlalchemy.Column('nickname', sqlalchemy.String(20), nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
+todo_table = sqlalchemy.Table(
+    'Todo',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('title', sqlalchemy.String(40), nullable=True),
+    sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
+    sqlalchemy.Column('completed_at', sqlalchemy.TIMESTAMP, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
 user_table = sqlalchemy.Table(
     'User',
     metadata,
@@ -137,6 +155,23 @@ video_comment_like_table = sqlalchemy.Table(
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 engine = sqlalchemy.create_engine(DATABASE_URL)
+
+
+class TodoUserEntity(BaseModel):
+    id: Optional[int] = None
+    email: EmailStr
+    password: str
+    nickname: str
+    created_at: datetime
+
+
+class TodoEntity(BaseModel):
+    id: Optional[int] = None
+    user_id: Optional[int] = None
+    title: str
+    content: str
+    completed_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
 
 
 class ShortsEntity(BaseModel):

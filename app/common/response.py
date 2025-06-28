@@ -3,6 +3,7 @@ import jwt
 from fastapi.requests import Request
 
 from app.database.mysql import UserEntity
+from app.service.todo_user import TodoUserService
 from app.service.user import UserService
 from config import Config
 
@@ -59,6 +60,18 @@ async def verify_api_token(request: Request) -> UserEntity:
         raise PermissionDeniedException()
     jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'])
     current_user = await UserService.find_one_by_id(jwt_data['id'])
+    if not current_user:
+        raise PermissionDeniedException()
+
+    return current_user
+
+
+async def verify_todo_api_token(request: Request) -> UserEntity:
+    token = request.headers.get('x-access-token')
+    if not token:
+        raise PermissionDeniedException()
+    jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'])
+    current_user = await TodoUserService.find_one_by_id(jwt_data['id'])
     if not current_user:
         raise PermissionDeniedException()
 
