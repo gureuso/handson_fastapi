@@ -28,3 +28,29 @@ class VideoService:
         """
         rows = await database.fetch_all(query)
         return [VideoEntity(**dict(row)) for row in rows]
+
+    @staticmethod
+    async def update_like_cnt(video_id: int, liked: bool):
+        if liked:
+            query = """
+                UPDATE Video SET like_cnt = like_cnt - 1 WHERE id = :video_id; \
+            """
+        else:
+            query = """
+                UPDATE Video SET like_cnt = like_cnt + 1 WHERE id = :video_id;
+            """
+        await database.execute(query, {'video_id': video_id})
+        return {}
+
+    @staticmethod
+    async def update_dislike_cnt(video_id: int, disliked: bool):
+        if disliked:
+            query = """
+                UPDATE Video SET dislike_cnt = dislike_cnt - 1 WHERE id = :video_id;
+            """
+        else:
+            query = """
+                UPDATE Video SET dislike_cnt = dislike_cnt + 1 WHERE id = :video_id;
+            """
+        await database.execute(query, {'video_id': video_id})
+        return {}

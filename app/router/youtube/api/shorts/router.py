@@ -20,7 +20,7 @@ router = APIRouter(prefix='/youtube/api/shorts')
 templates = Jinja2Templates(directory=Config.TEMPLATES_DIR)
 
 
-class CreateComment(BaseModel):
+class CreateCommentItem(BaseModel):
     content: str
 
 
@@ -142,7 +142,7 @@ async def get_comments(shorts_id: int, current_user: UserEntity | None = Depends
 
 
 @router.post('/{shorts_id}/comments')
-async def add_comment(shorts_id: int, item: CreateComment, current_user: UserEntity | None = Depends(verify_api_token)):
+async def add_comment(shorts_id: int, item: CreateCommentItem, current_user: UserEntity | None = Depends(verify_api_token)):
     await ShortsCommentService.create(
         ShortsCommentEntity(
             content=item.content, shorts_id=shorts_id, user_id=current_user.id, created_at=datetime.now(),
@@ -153,7 +153,7 @@ async def add_comment(shorts_id: int, item: CreateComment, current_user: UserEnt
 
 
 @router.post('/{shorts_id}/comments/{comment_id}')
-async def add_child_comment(shorts_id: int, comment_id: int, item: CreateComment, current_user: UserEntity | None = Depends(verify_api_token)):
+async def add_child_comment(shorts_id: int, comment_id: int, item: CreateCommentItem, current_user: UserEntity | None = Depends(verify_api_token)):
     await ShortsCommentService.create(
         ShortsCommentEntity(
             content=item.content, shorts_id=shorts_id, user_id=current_user.id, created_at=datetime.now(),

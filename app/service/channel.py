@@ -17,3 +17,9 @@ class ChannelService:
         query = channel_table.select().where(channel_table.c.id == channel_id)
         row = await database.fetch_one(query)
         return ChannelEntity(**dict(row)) if row else None
+
+    @staticmethod
+    async def find_one_by_user_id(user_id: int):
+        query = channel_table.select().where(channel_table.c.user_id == user_id)
+        row = await database.fetch_one(query)
+        return ChannelEntity(**dict(row)) if row else None

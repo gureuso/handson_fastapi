@@ -142,6 +142,8 @@ video_comment_table = sqlalchemy.Table(
     sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('video_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('like_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('dislike_cnt', sqlalchemy.BIGINT, server_default='0'),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 video_comment_like_table = sqlalchemy.Table(
@@ -150,7 +152,7 @@ video_comment_like_table = sqlalchemy.Table(
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
     sqlalchemy.Column('kind', sqlalchemy.String(10), nullable=True),
     sqlalchemy.Column('comment_id', sqlalchemy.Integer, nullable=True),
-    sqlalchemy.Column('shorts_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('video_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
@@ -255,7 +257,16 @@ class VideoCommentEntity(BaseModel):
     content: str
     video_id: Optional[int] = None
     user_id: Optional[int] = None
+    like_cnt: Optional[int] = 0
+    dislike_cnt: Optional[int] = 0
     created_at: datetime
+
+    # tmp
+    profile_image: Optional[str] = None
+    nickname: Optional[str] = None
+    child_comments: List['ShortsCommentEntity'] = Field(default_factory=list)
+    liked: bool = False
+    disliked: bool = False
 
 
 class VideoCommentLikeEnum(Enum):
@@ -279,7 +290,7 @@ class VideoLikeEnum(Enum):
 
 class VideoLikeEntity(BaseModel):
     id: Optional[int] = None
-    kind: ShortsLikeEnum
+    kind: VideoLikeEnum
     video_id: Optional[int] = None
     user_id: Optional[int] = None
     created_at: datetime
