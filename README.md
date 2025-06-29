@@ -46,8 +46,8 @@ create db and migrate tables
 
 ```mysql
 INSERT INTO
-    Channel (name, image, created_at)
-values ('한빛미디어', 'https://gureuso.s3.ap-northeast-2.amazonaws.com/fastapi/hanbit_logo.webp', '2025-06-05 19:16:12');
+    Channel (name, image, created_at, user_id)
+values ('한빛미디어', 'https://gureuso.s3.ap-northeast-2.amazonaws.com/fastapi/hanbit_logo.webp', '2025-06-05 19:16:12', 1);
 
 INSERT INTO
     Video (channel_id, title, thumbnail, content, created_at, tag)
