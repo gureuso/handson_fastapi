@@ -70,16 +70,16 @@ def test_get_todo_list():
     global token
     global todos
     with TestClient(app) as client:
-        resp = client.get('/todo?start=2025-05-01&end=2025-05-02', headers={'x-access-token': ''})
+        resp = client.get('/todo?start=2025-05-01 00:00:00&end=2025-05-03 00:00:00', headers={'x-access-token': ''})
         assert resp.status_code == 403
 
-        resp = client.get('/todo?start=2025-05-01&end=2025-05-02', headers={'x-access-token': token})
+        resp = client.get('/todo?start=2025-05-01 00:00:00&end=2025-05-03 00:00:00', headers={'x-access-token': token})
         assert resp.status_code == 200
 
         todos = resp.json()['todos']
         assert len(todos) == 3
 
-        resp = client.get('/todo?start=2025-05-02&end=2025-05-03', headers={'x-access-token': token})
+        resp = client.get('/todo?start=2025-05-03 00:00:00&end=2025-05-04 00:00:00', headers={'x-access-token': token})
         assert resp.status_code == 200
         assert len(resp.json()['todos']) == 0
 
