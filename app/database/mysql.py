@@ -59,6 +59,14 @@ channel_table = sqlalchemy.Table(
     sqlalchemy.Column('image', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
+channel_subscription_table = sqlalchemy.Table(
+    'ChannelSubscription',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column('channel_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
+)
 tag_table = sqlalchemy.Table(
     'Tag',
     metadata,
@@ -71,6 +79,7 @@ shorts_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
     sqlalchemy.Column('channel_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('title', sqlalchemy.String(255), nullable=True),
     sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
@@ -116,6 +125,7 @@ video_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True, autoincrement=True),
     sqlalchemy.Column('channel_id', sqlalchemy.Integer, nullable=True),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('title', sqlalchemy.String(255), nullable=True),
     sqlalchemy.Column('thumbnail', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
@@ -141,9 +151,10 @@ video_comment_table = sqlalchemy.Table(
     sqlalchemy.Column('parent_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('content', sqlalchemy.TEXT, nullable=True),
     sqlalchemy.Column('video_id', sqlalchemy.Integer, nullable=True),
-    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('like_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('user_id', sqlalchemy.Integer, nullable=True),
     sqlalchemy.Column('dislike_cnt', sqlalchemy.BIGINT, server_default='0'),
+    sqlalchemy.Column('is_fixed', sqlalchemy.SMALLINT, server_default='0'),
     sqlalchemy.Column('created_at', sqlalchemy.TIMESTAMP, nullable=True),
 )
 video_comment_like_table = sqlalchemy.Table(
@@ -179,6 +190,7 @@ class TodoEntity(BaseModel):
 class ShortsEntity(BaseModel):
     id: Optional[int] = None
     channel_id: Optional[int] = None
+    user_id: Optional[int] = None
     tag: str
     title: str
     thumbnail: str
@@ -237,6 +249,8 @@ class ShortsLikeEntity(BaseModel):
 class VideoEntity(BaseModel):
     id: Optional[int] = None
     channel_id: Optional[int] = None
+    user_id: Optional[int] = None
+    user_id: Optional[int] = None
     tag: str
     title: str
     thumbnail: str
@@ -259,12 +273,13 @@ class VideoCommentEntity(BaseModel):
     user_id: Optional[int] = None
     like_cnt: Optional[int] = 0
     dislike_cnt: Optional[int] = 0
+    is_fixed: bool = False
     created_at: datetime
 
     # tmp
     profile_image: Optional[str] = None
     nickname: Optional[str] = None
-    child_comments: List['ShortsCommentEntity'] = Field(default_factory=list)
+    child_comments: List['VideoCommentEntity'] = Field(default_factory=list)
     liked: bool = False
     disliked: bool = False
 
@@ -298,8 +313,16 @@ class VideoLikeEntity(BaseModel):
 
 class ChannelEntity(BaseModel):
     id: Optional[int] = None
+    user_id: Optional[int] = None
     name: str
     image: str
+    created_at: datetime
+
+
+class ChannelSubscriptionEntity(BaseModel):
+    id: Optional[int] = None
+    channel_id: Optional[int] = None
+    user_id: Optional[int] = None
     created_at: datetime
 
 

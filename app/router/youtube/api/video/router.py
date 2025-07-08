@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 from fastapi import APIRouter, Depends
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from app.common.response import verify_api_token, NotFoundException
+from app.common.response import verify_api_token, NotFoundException, BadRequestException, PermissionDeniedException
+from app.database.cache import Cache
 from app.database.mysql import UserEntity, VideoLikeEnum, VideoLikeEntity, VideoCommentEntity, VideoCommentLikeEnum, \
-    VideoCommentLikeEntity, ChannelEntity
+    VideoCommentLikeEntity
 from app.service.channel import ChannelService
+from app.service.channel_subscription import ChannelSubscriptionService
 from app.service.shorts import ShortsService
 from app.service.tag import TagService
+from app.service.user import UserService
 from app.service.video import VideoService
 from app.service.video_comment import VideoCommentService
 from app.service.video_comment_like import VideoCommentLikeService
@@ -45,11 +49,22 @@ async def find_video(video_id: int, current_user: UserEntity | None = Depends(ve
     liked: dict = await VideoLikeService.find_one_by_liked(video_id, current_user.id)
     disliked: dict = await VideoLikeService.find_one_by_disliked(video_id, current_user.id)
 
-    return {'video': video, 'channel': channel, 'liked': liked, 'disliked': disliked}
+    messages = await Cache.lrange(f'fastapi_room_{video_id}', 0, 100)
+    messages.reverse()
+    for idx, message in enumerate(messages):
+        messages[idx] = json.loads(message)
+
+    sub = await ChannelSubscriptionService.find_one_by_id(channel.id, current_user.id)
+    video_user = await UserService.find_one_by_id(video.user_id)
+
+    return {
+        'video': video, 'channel': channel, 'liked': liked, 'disliked': disliked, 'messages': messages,
+        'subscription': True if sub else False, 'video_user': video_user,
+    }
 
 
 @router.post('/{video_id}/like')
-async def add_shorts_like_cnt(video_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
+async def add_video_like_cnt(video_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
     dislike = await VideoLikeService.find_one_by_disliked(video_id, current_user.id)
     if dislike['disliked'] is True:
         await VideoLikeService.delete_by_user_id(video_id, current_user.id, VideoLikeEnum.DISLIKE)
@@ -77,7 +92,7 @@ async def add_shorts_like_cnt(video_id: int, current_user: UserEntity | None = D
 
 
 @router.post('/{video_id}/dislike')
-async def add_shorts_dislike_cnt(video_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
+async def add_video_dislike_cnt(video_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
     like = await VideoLikeService.find_one_by_liked(video_id, current_user.id)
     if like['liked'] is True:
         await VideoLikeService.delete_by_user_id(video_id, current_user.id, VideoLikeEnum.LIKE)
@@ -170,7 +185,7 @@ async def add_comment_like(video_id: int, comment_id: int, current_user: UserEnt
 
 
 @router.post('/{video_id}/comments/{comment_id}/dislike')
-async def add_shorts_dislike_cnt(video_id: int, comment_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
+async def add_video_dislike_cnt(video_id: int, comment_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
     like = await VideoCommentLikeService.find_one_by_liked(comment_id, current_user.id)
     if like['liked'] is True:
         await VideoCommentLikeService.delete_by_user_id(comment_id, current_user.id, VideoCommentLikeEnum.LIKE)
@@ -196,3 +211,19 @@ async def add_shorts_dislike_cnt(video_id: int, comment_id: int, current_user: U
         dislike['cnt'] += 1
     return {'like': like, 'dislike': dislike}
 
+
+@router.post('/{video_id}/comments/{comment_id}/fix')
+async def fix_comment(video_id: int, comment_id: int, current_user: UserEntity | None = Depends(verify_api_token)):
+    comment = await VideoCommentService.find_one_by_id(comment_id)
+    if not comment:
+        raise BadRequestException()
+    video = await VideoCommentService.find_one_by_id(video_id)
+    if not video:
+        raise BadRequestException()
+
+    if video.user_id != current_user.id:
+        raise PermissionDeniedException()
+
+    is_fixed = False if comment.is_fixed else True
+    await VideoCommentService.update_is_fixed(comment_id, is_fixed)
+    return {}

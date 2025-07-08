@@ -20,6 +20,10 @@ class NotFoundException(Exception):
     pass
 
 
+class InternalServerException(Exception):
+    pass
+
+
 def error(code, message=None):
     if not message:
         message = Config.ERROR_CODE[code]

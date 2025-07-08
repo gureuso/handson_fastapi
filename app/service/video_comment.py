@@ -27,7 +27,7 @@ class VideoCommentService:
             SELECT U.nickname, U.profile_image, VC.* FROM VideoComment AS VC 
                 JOIN User AS U ON VC.user_id = U.id 
             WHERE VC.parent_id IS NULL AND VC.video_id = :video_id
-            ORDER BY VC.created_at DESC;
+            ORDER BY VC.is_fixed DESC, VC.created_at DESC;
         """
         rows = await database.fetch_all(query, {'video_id': video_id})
         return [VideoCommentEntity(**dict(row)) for row in rows]
@@ -67,4 +67,12 @@ class VideoCommentService:
                 UPDATE VideoComment SET dislike_cnt = dislike_cnt + 1 WHERE id = :comment_id;
             """
         await database.execute(query, {'comment_id': comment_id})
+        return {}
+
+    @staticmethod
+    async def update_is_fixed(comment_id: int, is_fixed: bool):
+        query = """
+            UPDATE VideoComment SET is_fixed = :is_fixed WHERE id = :comment_id; 
+        """
+        await database.execute(query, {'comment_id': comment_id, 'is_fixed': is_fixed})
         return {}
