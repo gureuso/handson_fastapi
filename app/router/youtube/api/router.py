@@ -3,16 +3,18 @@ import string
 import jwt
 import random
 from typing import Literal
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, status, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
+from fastapi.requests import Request
 from pydantic import BaseModel
 
 from app.common.email import EmailSender
-from app.common.response import verify_api_token, BadRequestException
+from app.common.response import verify_api_token, BadRequestException, PermissionDeniedException
 from app.common.sms import SmsFactory, SmsEnum
 from app.common.sns import SNSInfo
+from app.database.cache import Cache
 from app.database.mysql import UserEntity
 from app.service.user import UserService
 from config import Config, JsonConfig
@@ -23,6 +25,10 @@ templates = Jinja2Templates(directory=Config.TEMPLATES_DIR)
 
 class SMSItem(BaseModel):
     phone: str
+
+
+class TokenItem(BaseModel):
+    token: str
 
 
 @router.get('/auth/sms')
@@ -88,6 +94,36 @@ async def signout():
     return response
 
 
+@router.get('/token')
+async def token(request: Request):
+    access_token = request.cookies.get('x-access-token')
+
+    response = RedirectResponse(
+        url='http://localhost:3000' if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT else 'https://youtube.devmaker.kr',
+        status_code=status.HTTP_302_FOUND)
+
+    try:
+        jwt.decode(access_token, Config.SECRET, algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        exp_token = await Cache.get(f'fastapi_jwt_token_{access_token}')
+        if exp_token:
+            return response
+        else:
+            await Cache.set(f'fastapi_jwt_token_{access_token}', access_token)
+
+            jwt_data = jwt.decode(access_token, Config.SECRET, algorithms=['HS256'], options={'verify_exp': False})
+            new_token = jwt.encode({'id': jwt_data['id'], 'exp': datetime.utcnow() + timedelta(hours=1)},
+                                   JsonConfig.get_data('SECRET'), algorithm='HS256')
+
+            if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT:
+                response.set_cookie('x-access-token', new_token, httponly=True)
+            else:
+                response.set_cookie('x-access-token', new_token, domain='youtube.devmaker.kr', httponly=True,
+                                    secure=True)
+
+    return response
+
+
 @router.get('/callback/{provider}')
 async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'github'], code: str):
     sns_info = SNSInfo(provider, code)
@@ -119,11 +155,11 @@ async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'gi
 
     if Config.APP_MODE == Config.APP_MODE_DEVELOPMENT:
         response.set_cookie('x-access-token',
-                            jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
+                            jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=1)}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
                             httponly=True)
     else:
         response.set_cookie('x-access-token',
-                            jwt.encode({'id': user.id}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
+                            jwt.encode({'id': user.id, 'exp': datetime.utcnow() + timedelta(hours=1)}, JsonConfig.get_data('SECRET'), algorithm='HS256'),
                             domain='youtube.devmaker.kr',
                             httponly=True,
                             secure=True)

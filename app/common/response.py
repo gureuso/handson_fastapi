@@ -62,7 +62,13 @@ async def verify_api_token(request: Request) -> UserEntity:
     token = request.cookies.get('x-access-token') or request.headers.get('x-access-token')
     if not token:
         raise PermissionDeniedException()
-    jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'])
+
+    try:
+        jwt.decode(token, Config.SECRET, algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        raise PermissionDeniedException()
+
+    jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'], options={'verify_exp': False})
     current_user = await UserService.find_one_by_id(jwt_data['id'])
     if not current_user:
         raise PermissionDeniedException()
