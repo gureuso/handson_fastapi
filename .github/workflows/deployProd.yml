@@ -38,8 +38,8 @@ jobs:
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v20
         with:
-          aws_access_key: ${{ secrets.EB_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.EB_SECRET_KEY }}
+          aws_access_key: ${{ secrets.FASTAPI_EB_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.FASTAPI_EB_SECRET_KEY }}
           wait_for_deployment: false
           application_name: fastapi
           environment_name: fastapi-env
