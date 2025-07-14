@@ -32,7 +32,7 @@ jobs:
 
       - name: Create config.json and .zip file
         run: |
-          echo '{"APP_PORT": 8080, "APP_MODE": "production", "AES256_KEY": "${{ secrets.FASTAPI_AES256_KEY }}", "DB_USER_NAME": "${{ secrets.FASTAPI_DB_USER_NAME }}", "DB_USER_PASSWD": "${{ secrets.FASTAPI_DB_USER_PASSWD }}", "DB_HOST": "${{ secrets.FASTAPI_DB_HOST }}", "DB_NAME": "${{ secrets.FASTAPI_DB_NAME }}", "SECRET": "${{ secrets.FASTAPI_SECRET }}", "GOOGLE_CLIENT_ID": "17027771141-013lhjhd887gda8seu1f0dbeet0bllkp.apps.googleusercontent.com", "GOOGLE_SECRET_ID": "${{ secrets.FASTAPI_GOOGLE_SECRET_ID }}", "KAKAO_CLIENT_ID": "eec1a6ee6dcc81867bfb2375006dbdef", "GITHUB_CLIENT_ID": "Ov23liz4lNHVSl9wrBEB", "GITHUB_SECRET_ID": "${{ secrets.FASTAPI_GITHUB_SECRET_ID }}"}' > config.json
+          echo '{"APP_PORT": 8000, "APP_MODE": "production", "AES256_KEY": "${{ secrets.FASTAPI_AES256_KEY }}", "DB_USER_NAME": "${{ secrets.FASTAPI_DB_USER_NAME }}", "DB_USER_PASSWD": "${{ secrets.FASTAPI_DB_USER_PASSWD }}", "DB_HOST": "${{ secrets.FASTAPI_DB_HOST }}", "DB_NAME": "${{ secrets.FASTAPI_DB_NAME }}", "SECRET": "${{ secrets.FASTAPI_SECRET }}", "GOOGLE_CLIENT_ID": "17027771141-013lhjhd887gda8seu1f0dbeet0bllkp.apps.googleusercontent.com", "GOOGLE_SECRET_ID": "${{ secrets.FASTAPI_GOOGLE_SECRET_ID }}", "KAKAO_CLIENT_ID": "eec1a6ee6dcc81867bfb2375006dbdef", "GITHUB_CLIENT_ID": "Ov23liz4lNHVSl9wrBEB", "GITHUB_SECRET_ID": "${{ secrets.FASTAPI_GITHUB_SECRET_ID }}"}' > config.json
           zip -r fastapi-prod-${{ github.run_id }}-${{ github.run_attempt }}.zip . -x '*.git*'
 
       - name: Deploy Consumer to EB
