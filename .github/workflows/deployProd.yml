@@ -20,16 +20,6 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.13'
-      - run: |
-          pip install awsebcli --upgrade --user
-          pip install virtualenv
-          virtualenv venv
-          . venv/bin/activate
-          pip install -r requirements.txt
-
       - name: Create config.json and .zip file
         run: |
           echo '{"APP_PORT": 8000, "APP_MODE": "production", "AES256_KEY": "${{ secrets.FASTAPI_AES256_KEY }}", "DB_USER_NAME": "${{ secrets.FASTAPI_DB_USER_NAME }}", "DB_USER_PASSWD": "${{ secrets.FASTAPI_DB_USER_PASSWD }}", "DB_HOST": "${{ secrets.FASTAPI_DB_HOST }}", "DB_NAME": "${{ secrets.FASTAPI_DB_NAME }}", "SECRET": "${{ secrets.FASTAPI_SECRET }}", "GOOGLE_CLIENT_ID": "17027771141-013lhjhd887gda8seu1f0dbeet0bllkp.apps.googleusercontent.com", "GOOGLE_SECRET_ID": "${{ secrets.FASTAPI_GOOGLE_SECRET_ID }}", "KAKAO_CLIENT_ID": "eec1a6ee6dcc81867bfb2375006dbdef", "GITHUB_CLIENT_ID": "Ov23liz4lNHVSl9wrBEB", "GITHUB_SECRET_ID": "${{ secrets.FASTAPI_GITHUB_SECRET_ID }}"}' > config.json
