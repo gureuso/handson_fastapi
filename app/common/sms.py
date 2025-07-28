@@ -28,7 +28,7 @@ class SmsFactory:
         self.kind = kind
         self.phone_number = phone_number
 
-    def send(self, message: str):
+    def send(self, message: str) -> bool:
         """
             send factory version
         """
@@ -44,9 +44,9 @@ class SmsFactory:
 
 class SMS(metaclass=ABCMeta):
     @abstractmethod
-    def send(self, phone_number: str) -> bool:
+    def send(self, message: str) -> bool:
         """
-        :param phone_number:
+        :param message:
         :return:
         """
         pass
@@ -60,7 +60,7 @@ class AligoSMS(SMS):
         self.api_key = ''
         self.phone_number = phone_number
 
-    def send(self, message) -> bool:
+    def send(self, message: str) -> bool:
         """
             send aligo
         """
@@ -88,7 +88,7 @@ class TwilioSMS(SMS):
         self.auth_token = ''
         self.phone_number = phone_number
 
-    def send(self, message) -> bool:
+    def send(self, message: str) -> bool:
         """
             send twilio
         """

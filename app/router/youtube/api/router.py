@@ -7,14 +7,12 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, status, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from fastapi.requests import Request
 from pydantic import BaseModel
 
 from app.common.email import EmailSender
-from app.common.response import verify_api_token, BadRequestException, PermissionDeniedException
+from app.common.response import verify_api_token, BadRequestException
 from app.common.sms import SmsFactory, SmsEnum
 from app.common.sns import SNSInfo
-from app.database.cache import Cache
 from app.database.mysql import UserEntity
 from app.service.user import UserService
 from config import Config, JsonConfig
