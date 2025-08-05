@@ -14,6 +14,7 @@ $ virtualenv -p python3 venv
 ```sh
 $ . venv/bin/activate # mac, linux
 $ call venv\Scripts\activate # windows
+$ . venv/Scripts/activate # windows git bash
 ```
 
 ```sh
