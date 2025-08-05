@@ -25,13 +25,13 @@ $ pip install -r requirements.txt
 | ------------------- |----------------------------------------------|
 | APP_MODE            | choose from production, development, testing |
 | APP_HOST            | ip address ex) 0.0.0.0                       |
-| APP_PORT            | port number                                  |
+| APP_PORT            | port number ex) 8888                         |
 | DB_USER_NAME        | db user name                                 |
 | DB_USER_PASSWD      | db user password                             |
-| DB_HOST             | db host                                      |
+| DB_HOST             | db host ex) devmaker.kr                      |
 | DB_DB_NAME          | db name                                      |
-| REDIS_HOST          | redis ip address                             |
-| REDIS_PASSWD        | redis password                               |
+| REDIS_HOST          | redis ip address default) localhost          |
+| REDIS_PASSWD        | redis password default) None                 |
 
 ### 3. db migrate
 ```mysql
