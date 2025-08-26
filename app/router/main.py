@@ -8,7 +8,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
-from fastapi.exceptions import HTTPException
+from fastapi.exceptions import HTTPException, ResponseValidationError, RequestValidationError
 from fastapi.websockets import WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
@@ -34,8 +34,8 @@ def doc_auth(credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username != 'admin' or credentials.password != '1234':
         raise HTTPException(
             status_code=401,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Basic"},
+            detail='Incorrect username or password',
+            headers={'WWW-Authenticate': 'Basic'},
         )
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
@@ -65,15 +65,9 @@ async def chat_endpoint(websocket: WebSocket, room: str):
         manager.disconnect(websocket, room)
 
 
-@app.exception_handler(404)
-async def page_not_found_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(status_code=exc.status_code, content=error(exc.status_code * 100))
-    # return templates.TemplateResponse(f'{exc.status_code}.html', {'request': request, 'current_user': current_user})
-
-
-@app.exception_handler(422)
-async def page_not_found_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(status_code=exc.status_code, content=error(exc.status_code * 100))
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(status_code=422, content=error(422 * 100))
 
 
 @app.exception_handler(BadRequestException)
