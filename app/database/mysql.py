@@ -250,7 +250,6 @@ class VideoEntity(BaseModel):
     id: Optional[int] = None
     channel_id: Optional[int] = None
     user_id: Optional[int] = None
-    user_id: Optional[int] = None
     tag: str
     title: str
     thumbnail: str

@@ -2,8 +2,25 @@ import base64
 import hashlib
 from Cryptodome import Random
 from Cryptodome.Cipher import AES
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import serialization, hashes
 
 from config import JsonConfig, Config
+
+
+def encrypt_with_public_key(message: bytes) -> bytes:
+    public_key = serialization.load_pem_public_key("""""".encode('utf-8'))
+    return public_key.encrypt(
+        message,
+        padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
+    )
+
+def decrypt_with_private_key(ciphertext: bytes) -> bytes:
+    private_key = serialization.load_pem_private_key("""""".encode('utf-8'), password=None)
+    return private_key.decrypt(
+        ciphertext,
+        padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
+    )
 
 
 class AESCipher:

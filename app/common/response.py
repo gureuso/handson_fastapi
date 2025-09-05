@@ -1,7 +1,11 @@
+import json
 import re
+from base64 import b64decode
+
 import jwt
 from fastapi.requests import Request
 
+from app.common.auth import decrypt_with_private_key
 from app.database.mysql import UserEntity
 from app.service.todo_user import TodoUserService
 from app.service.user import UserService
@@ -86,3 +90,13 @@ async def verify_todo_api_token(request: Request) -> UserEntity:
         raise PermissionDeniedException()
 
     return current_user
+
+
+async def parse_decrypted_item(request: Request) -> dict:
+    # plaintext = json.dumps({'a': '1234'}).encode()
+    # ciphertext = encrypt_with_public_key(plaintext)
+    # payload = b64encode(ciphertext).decode()
+
+    data = await request.json()
+    decrypted = decrypt_with_private_key(b64decode(data['content']))
+    return json.loads(decrypted.decode('utf-8'))

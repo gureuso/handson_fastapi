@@ -40,7 +40,6 @@ def doc_auth(credentials: HTTPBasicCredentials = Depends(security)):
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 APIRouterRegister(app, 'app.router', 'router').register()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
