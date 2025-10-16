@@ -115,6 +115,9 @@ async def callback(provider: Literal['google', 'facebook', 'kakao', 'naver', 'gi
             phone_number=None,
             phone_send_at=None,
             phone_validation_number=None,
+            phone_is_validation=0,
+            email_validation_number=None,
+            email_is_validation=0,
             profile_image=image[random.randint(0, len(image) - 1)],
             nickname=nickname,
         ))
