@@ -3,11 +3,11 @@ import os
 from config import Config
 
 try:
-    activate_this = os.path.join(*[Config.ROOT_DIR, 'venv', 'bin', 'activate_this.py'])
+    activate_this = os.path.join(*[Config.ROOT_DIR, '.venv', 'bin', 'activate_this.py'])
     with open(activate_this) as f:
         exec(f.read(), dict(__file__=activate_this))
 except FileNotFoundError:
-    activate_this = os.path.join(*[Config.ROOT_DIR, 'venv', 'Scripts', 'activate_this.py'])
+    activate_this = os.path.join(*[Config.ROOT_DIR, '.venv', 'Scripts', 'activate_this.py'])
     with open(activate_this) as f:
         exec(f.read(), dict(__file__=activate_this))
 
