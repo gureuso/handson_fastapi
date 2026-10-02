@@ -4,13 +4,16 @@ from app.database.mysql import database, UserEntity, user_table
 class UserService:
     @staticmethod
     async def create(user_entity: UserEntity) -> UserEntity:
-        query = user_table.insert().values(email=user_entity.email, provider=user_entity.provider,
-                                           created_at=user_entity.created_at, phone_number=user_entity.phone_number,
-                                           phone_validation_number=user_entity.phone_validation_number,
-                                           phone_send_at=user_entity.phone_send_at,
-                                           email_validation_number=user_entity.email_validation_number,
-                                           profile_image=user_entity.profile_image,
-                                           nickname=user_entity.nickname,)
+        query = user_table.insert().values(
+            email=user_entity.email, provider=user_entity.provider,
+            created_at=user_entity.created_at, phone_number=user_entity.phone_number,
+            phone_validation_number=user_entity.phone_validation_number,
+            phone_send_at=user_entity.phone_send_at,
+            email_validation_number=user_entity.email_validation_number,
+            profile_image=user_entity.profile_image,
+            nickname=user_entity.nickname,
+            email_is_validation=user_entity.email_is_validation,
+        )
         ai = await database.execute(query)
         user_entity.id = ai
         return user_entity
