@@ -7,8 +7,8 @@ from fastapi.requests import Request
 
 from app.common.auth import decrypt_with_private_key
 from app.database.mysql import UserEntity
-from app.service.todo_user import TodoUserService
-from app.service.user import UserService
+from app.repository.todo_user import TodoUserRepository
+from app.repository.user import UserRepository
 from config import Config
 
 
@@ -55,7 +55,7 @@ async def verify_token(request: Request) -> None | UserEntity:
     if not token:
         return None
     jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'])
-    current_user = await UserService.find_one_by_id(jwt_data['id'])
+    current_user = await UserRepository().find_one_by_id(jwt_data['id'])
     if not current_user:
         return None
 
@@ -73,7 +73,7 @@ async def verify_api_token(request: Request) -> UserEntity:
         raise PermissionDeniedException()
 
     jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'], options={'verify_exp': False})
-    current_user = await UserService.find_one_by_id(jwt_data['id'])
+    current_user = await UserRepository().find_one_by_id(jwt_data['id'])
     if not current_user:
         raise PermissionDeniedException()
 
@@ -85,7 +85,7 @@ async def verify_todo_api_token(request: Request) -> UserEntity:
     if not token:
         raise PermissionDeniedException()
     jwt_data = jwt.decode(token, Config.SECRET, algorithms=['HS256'])
-    current_user = await TodoUserService.find_one_by_id(jwt_data['id'])
+    current_user = await TodoUserRepository().find_one_by_id(jwt_data['id'])
     if not current_user:
         raise PermissionDeniedException()
 

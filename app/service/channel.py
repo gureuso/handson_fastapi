@@ -1,25 +1,28 @@
-from app.database.mysql import database, ChannelEntity, channel_table
+from datetime import datetime
+
+from app.database.mysql import UserEntity, ChannelSubscriptionEntity
+from app.repository.channel import ChannelRepository
+from app.repository.channel_subscription import ChannelSubscriptionRepository
 
 
 class ChannelService:
-    @staticmethod
-    async def create(channel_entity: ChannelEntity) -> ChannelEntity:
-        query = channel_table.insert().values(
-            name=channel_entity.name, image=channel_entity.image,
-            created_at=channel_entity.created_at,
-        )
-        ai = await database.execute(query)
-        channel_entity.id = ai
-        return channel_entity
+    def __init__(self):
+        self.channel_subscription_repository = ChannelSubscriptionRepository()
+        self.channel_repository = ChannelRepository()
 
-    @staticmethod
-    async def find_one_by_id(channel_id: int):
-        query = channel_table.select().where(channel_table.c.id == channel_id)
-        row = await database.fetch_one(query)
-        return ChannelEntity(**dict(row)) if row else None
+    async def get_channel(self, channel_id: int, user: UserEntity) -> dict:
+        sub = await self.channel_subscription_repository.find_one_by_id(channel_id, user.id)
+        channel = await self.channel_repository.find_one_by_id(channel_id)
+        return {'subscription': sub, 'channel': channel}
 
-    @staticmethod
-    async def find_one_by_user_id(user_id: int):
-        query = channel_table.select().where(channel_table.c.user_id == user_id)
-        row = await database.fetch_one(query)
-        return ChannelEntity(**dict(row)) if row else None
+    async def toggle_subscription(self, channel_id: int, user: UserEntity) -> bool:
+        sub = await self.channel_subscription_repository.find_one_by_id(channel_id, user.id)
+        if sub:
+            await self.channel_subscription_repository.delete(channel_id, user.id)
+            return False
+
+        await self.channel_subscription_repository.create(ChannelSubscriptionEntity(
+            channel_id=channel_id, user_id=user.id,
+            created_at=datetime.now(),
+        ))
+        return True

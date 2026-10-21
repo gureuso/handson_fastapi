@@ -331,7 +331,7 @@ class TagEntity(BaseModel):
     name: str
 
 class UserEntity(BaseModel):
-    id: Optional[int] = None
+    id: int = 0
     email: str
     provider: str
     phone_number: str | None

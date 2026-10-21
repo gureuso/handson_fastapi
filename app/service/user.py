@@ -1,83 +1,76 @@
-from app.database.mysql import database, UserEntity, user_table
+import random
+import string
+from datetime import datetime
+
+from app.common.email import EmailSender
+from app.common.response import BadRequestException
+from app.common.sms import SmsFactory, SmsEnum
+from app.database.mysql import UserEntity
+from app.repository.user import UserRepository
+
+PROFILE_IMAGES = [
+    'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_02.png',
+    'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_03.png',
+    'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_04.png',
+    'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_05.png',
+    'https://gureuso.s3.ap-northeast-2.amazonaws.com/gomin/gomin_profile_06.png',
+]
 
 
 class UserService:
-    @staticmethod
-    async def create(user_entity: UserEntity) -> UserEntity:
-        query = user_table.insert().values(
-            email=user_entity.email, provider=user_entity.provider,
-            created_at=user_entity.created_at, phone_number=user_entity.phone_number,
-            phone_validation_number=user_entity.phone_validation_number,
-            phone_send_at=user_entity.phone_send_at,
-            email_validation_number=user_entity.email_validation_number,
-            profile_image=user_entity.profile_image,
-            nickname=user_entity.nickname,
-            email_is_validation=user_entity.email_is_validation,
-        )
-        ai = await database.execute(query)
-        user_entity.id = ai
-        return user_entity
+    def __init__(self):
+        self.user_repository = UserRepository()
 
-    @staticmethod
-    async def find_one_by_id(user_id: int):
-        query = user_table.select().where(user_table.c.id == user_id)
-        row = await database.fetch_one(query)
-        return UserEntity(**dict(row)) if row else None
+    async def verify_phone(self, user: UserEntity, code: str):
+        if code != user.phone_validation_number:
+            raise BadRequestException()
 
-    @staticmethod
-    async def find_one_by_email(email: str):
-        query = user_table.select().where(user_table.c.email == email)
-        row = await database.fetch_one(query)
-        return UserEntity(**dict(row)) if row else None
+        user.phone_is_validation = 1
+        await self.user_repository.update_phone_is_validation(user)
 
-    @staticmethod
-    async def delete_by_id(user_id: int):
-        query = """
-                DELETE FROM User WHERE id = :user_id
-            """
-        await database.execute(query, {'user_id': user_id})
-        return {}
+    async def send_phone_code(self, user: UserEntity, phone: str):
+        code = int(random.random() * 1000000)
 
-    @staticmethod
-    async def update_phone(user: UserEntity):
-        query = """
-            UPDATE User 
-            SET phone_number = :phone_number, phone_validation_number = :phone_validation_number, 
-                phone_send_at = :phone_send_at 
-            WHERE id = :user_id
-        """
-        await database.execute(query, {
-            'phone_number': user.phone_number, 'phone_validation_number': user.phone_validation_number,
-            'phone_send_at': user.phone_send_at, 'user_id': user.id
-        })
-        return {}
+        sms_sender = SmsFactory(SmsEnum.TWILIO, phone)
+        sms_sender.send(f'인증번호는 [{code}]입니다.')
 
-    @staticmethod
-    async def update_email(user: UserEntity):
-        query = """
-            UPDATE User 
-            SET email_validation_number = :email_validation_number 
-            WHERE id = :user_id
-        """
-        await database.execute(query, {'email_validation_number': user.email_validation_number, 'user_id': user.id})
-        return {}
+        user.phone_number = phone
+        user.phone_validation_number = str(code)
+        user.phone_send_at = datetime.now()
+        await self.user_repository.update_phone(user)
 
-    @staticmethod
-    async def update_email_is_validation(user: UserEntity):
-        query = """
-            UPDATE User 
-            SET email_is_validation = :email_is_validation 
-            WHERE id = :user_id
-        """
-        await database.execute(query, {'email_is_validation': user.email_is_validation, 'user_id': user.id})
-        return {}
+    async def verify_email(self, user: UserEntity, code: str):
+        if code != user.email_validation_number:
+            raise BadRequestException()
 
-    @staticmethod
-    async def update_phone_is_validation(user: UserEntity):
-        query = """
-                UPDATE User 
-                SET phone_is_validation = :phone_is_validation 
-                WHERE id = :user_id
-            """
-        await database.execute(query, {'phone_is_validation': user.phone_is_validation, 'user_id': user.id})
-        return {}
+        user.email_is_validation = 1
+        await self.user_repository.update_email_is_validation(user)
+
+    async def send_email_code(self, user: UserEntity):
+        code = int(random.random() * 1000000)
+
+        email_sender = EmailSender(user)
+        email_sender.send('youtube', f'인증번호는 [{code}]입니다.')
+
+        user.email_validation_number = str(code)
+        await self.user_repository.update_email(user)
+
+    async def find_or_create_by_email(self, email: str, provider: str) -> UserEntity:
+        user = await self.user_repository.find_one_by_email(email)
+        if user:
+            return user
+
+        nickname = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        return await self.user_repository.create(UserEntity(
+            email=email,
+            provider=provider,
+            created_at=datetime.now(),
+            phone_number=None,
+            phone_send_at=None,
+            phone_validation_number=None,
+            phone_is_validation=0,
+            email_validation_number=None,
+            email_is_validation=0,
+            profile_image=PROFILE_IMAGES[random.randint(0, len(PROFILE_IMAGES) - 1)],
+            nickname=nickname,
+        ))

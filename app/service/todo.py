@@ -1,46 +1,67 @@
+import random
+import string
+import jwt
 from datetime import datetime
 from typing import List
 
-from app.database.mysql import database, TodoEntity, todo_table
+from pydantic import EmailStr
+
+from app.common.auth import sha256_encrypt
+from app.common.response import BadRequestException
+from app.database.mysql import TodoUserEntity, TodoEntity
+from app.repository.todo import TodoRepository
+from app.repository.todo_user import TodoUserRepository
+from config import JsonConfig
+
+
+class TodoUserService:
+    def __init__(self):
+        self.todo_user_repository = TodoUserRepository()
+
+    async def signup(self, email: EmailStr, password: str):
+        todo_user = await self.todo_user_repository.find_one_by_email(email)
+        if todo_user:
+            raise BadRequestException()
+
+        nickname = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        await self.todo_user_repository.create(TodoUserEntity(
+            email=email,
+            password=sha256_encrypt(password),
+            nickname=nickname,
+            created_at=datetime.now(),
+        ))
+
+    async def signin(self, email: EmailStr, password: str) -> str:
+        todo_user = await self.todo_user_repository.find_one_by_email(email)
+        if not todo_user:
+            raise BadRequestException()
+
+        if todo_user.password != sha256_encrypt(password):
+            raise BadRequestException()
+
+        return jwt.encode({'id': todo_user.id}, JsonConfig.get_data('SECRET'))
 
 
 class TodoService:
-    @staticmethod
-    async def create(todo_entity: TodoEntity) -> TodoEntity:
-        query = todo_table.insert().values(
-            user_id=todo_entity.user_id, title=todo_entity.title, content=todo_entity.content,
-            completed_at=todo_entity.completed_at, created_at=todo_entity.created_at
-        )
-        ai = await database.execute(query)
-        todo_entity.id = ai
-        return todo_entity
+    def __init__(self):
+        self.todo_repository = TodoRepository()
 
-    @staticmethod
-    async def find_one_by_id(todo_id: int, user_id: int):
-        query = todo_table.select().where(todo_table.c.id == todo_id).where(todo_table.c.user_id == user_id)
-        row = await database.fetch_one(query)
-        return TodoEntity(**dict(row)) if row else None
+    async def create(self, user_id: int, title: str, content: str, created_at: datetime):
+        await self.todo_repository.create(TodoEntity(
+            user_id=user_id, title=title, content=content, completed_at=None, created_at=created_at,
+        ))
 
-    @staticmethod
-    async def find_all(start: datetime, end: datetime) -> List[TodoEntity]:
-        query = """
-            SELECT T.* FROM Todo AS T WHERE T.created_at >= :start AND T.created_at <= :end;
-        """
-        rows = await database.fetch_all(query, {'start': start, 'end': end})
-        return [TodoEntity(**dict(row)) for row in rows]
+    async def find_all(self, start: datetime, end: datetime) -> List[TodoEntity]:
+        return await self.todo_repository.find_all(start, end)
 
-    @staticmethod
-    async def complete(todo_id: int, user_id: int):
-        query = """
-            UPDATE Todo SET completed_at = :now WHERE id = :todo_id AND user_id = :user_id;
-        """
-        await database.execute(query, {'todo_id': todo_id, 'user_id': user_id, 'now': datetime.now()})
-        return {}
+    async def find_one_by_id(self, todo_id: int, user_id: int) -> TodoEntity:
+        todo = await self.todo_repository.find_one_by_id(todo_id, user_id)
+        if not todo:
+            raise BadRequestException()
+        return todo
 
-    @staticmethod
-    async def delete(todo_id: int, user_id: int):
-        query = """
-            DELETE FROM Todo WHERE id = :todo_id AND user_id = :user_id;
-        """
-        await database.execute(query, {'todo_id': todo_id, 'user_id': user_id})
-        return {}
+    async def delete(self, todo_id: int, user_id: int):
+        await self.todo_repository.delete(todo_id, user_id)
+
+    async def complete(self, todo_id: int, user_id: int):
+        await self.todo_repository.complete(todo_id, user_id)
