@@ -66,7 +66,7 @@ async def chat_endpoint(websocket: WebSocket, room: str):
 
 @app.exception_handler(RequestValidationError)
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(status_code=422, content=error(422 * 100))
+    return JSONResponse(status_code=422, content=error(42200))
 
 
 @app.exception_handler(BadRequestException)
@@ -77,6 +77,11 @@ async def bad_request_exception_handler(request: Request, exc: BadRequestExcepti
 @app.exception_handler(PermissionDeniedException)
 async def permission_denied_exception_handler(request: Request, exc: PermissionDeniedException):
     return JSONResponse(status_code=403, content=error(40300))
+
+
+@app.exception_handler(404)
+async def not_found_exception_handler(request: Request, exc: NotFoundException):
+    return JSONResponse(status_code=404, content=error(40400))
 
 
 @app.exception_handler(NotFoundException)

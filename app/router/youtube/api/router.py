@@ -26,25 +26,25 @@ class TokenItem(BaseModel):
 
 
 @router.get('/auth/sms')
-async def auth_sms(code: str, current_user: UserEntity | None = Depends(verify_api_token), user_service: UserService = Depends()):
+async def auth_sms(code: str, current_user: UserEntity = Depends(verify_api_token), user_service: UserService = Depends()):
     await user_service.verify_phone(current_user, code)
     return {}
 
 
 @router.post('/auth/sms')
-async def auth_sms_send(item: SMSItem, current_user: UserEntity | None = Depends(verify_api_token), user_service: UserService = Depends()):
+async def auth_sms_send(item: SMSItem, current_user: UserEntity = Depends(verify_api_token), user_service: UserService = Depends()):
     await user_service.send_phone_code(current_user, item.phone)
     return {}
 
 
 @router.get('/auth/email')
-async def auth_email(code: str, current_user: UserEntity | None = Depends(verify_api_token), user_service: UserService = Depends()):
+async def auth_email(code: str, current_user: UserEntity = Depends(verify_api_token), user_service: UserService = Depends()):
     await user_service.verify_email(current_user, code)
     return {}
 
 
 @router.post('/auth/email')
-async def auth_email_send(current_user: UserEntity | None = Depends(verify_api_token), user_service: UserService = Depends()):
+async def auth_email_send(current_user: UserEntity = Depends(verify_api_token), user_service: UserService = Depends()):
     await user_service.send_email_code(current_user)
     return {}
 
